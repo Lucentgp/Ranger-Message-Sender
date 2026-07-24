@@ -381,6 +381,33 @@
     return Math.round(secs / 60) + 'm ago';
   }
 
+  // For longer-lived timestamps (last update check, last reboot) rather
+  // than the second-by-second GPS/relay ones above -- these come from
+  // update_kiosk.py as naive ISO strings (laptop's local clock, no
+  // timezone), so this is relative to the viewer's own clock and can
+  // drift a little if laptop and viewer are in different timezones.
+  function relativeFromIso(iso) {
+    if (!iso) return '—';
+    var t = new Date(iso).getTime();
+    if (isNaN(t)) return '—';
+    var mins = Math.round((Date.now() - t) / 60000);
+    if (mins < 1) return 'just now';
+    if (mins < 60) return mins + 'm ago';
+    var hrs = Math.floor(mins / 60);
+    if (hrs < 48) return hrs + 'h ago';
+    return Math.floor(hrs / 24) + 'd ago';
+  }
+
+  function fmtVersion(v) {
+    // update_kiosk.py writes VERSION_FILE as YYYYMMDDHHMMSS on the run
+    // that last actually changed a file -- parse that into something
+    // readable rather than showing the raw digit string.
+    if (!v || v.length !== 14) return v || '—';
+    var y = v.slice(0, 4), mo = v.slice(4, 6), d = v.slice(6, 8);
+    var h = v.slice(8, 10), mi = v.slice(10, 12);
+    return y + '-' + mo + '-' + d + ' ' + h + ':' + mi;
+  }
+
   function labelBadge(label) {
     if (label === 'FrG') return { text: 'GPS FRG', cls: 'frg' };
     if (label && label.indexOf('FrG') !== -1) return { text: 'LS(FrG)', cls: 'trans' };
@@ -440,6 +467,12 @@
           row('Speed', spd) +
           row('Heading', hdg) +
           row('HDOP', hdop) +
+          '<div class="sec-title">UPDATES</div>' +
+          row('Version', fmtVersion(d.fleet_version)) +
+          row('Last update check', relativeFromIso(d.last_update_check)) +
+          row('Last reboot', relativeFromIso(d.last_boot)) +
+          row('Restart pending', d.update_available ? 'Yes' : 'No', d.update_available ? 'amber' : undefined) +
+          row('Updates paused', d.update_paused ? 'YES' : 'No', d.update_paused ? 'red' : undefined) +
           '<div class="sec-title">RELAY</div>' +
           row('Last report', lastSeenText(d.lastSeen)) +
         '</div>'
