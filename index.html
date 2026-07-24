@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RTMC IT — Ranger Broadcast Console</title>
+<title>RTMC IT / Ranger Broadcast Console</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -682,7 +682,7 @@
         <div class="panel-head">Message</div>
         <div class="panel-body">
           <label class="field-label" for="msgText">Text</label>
-          <textarea id="msgText" maxlength="220" placeholder="Ice on bridges this morning — use caution"></textarea>
+          <textarea id="msgText" maxlength="220" placeholder="Ice on bridges this morning, use caution"></textarea>
           <div class="charcount"><span id="charCount">0</span>/220</div>
 
           <label class="field-label" style="margin-top:10px;">Delivery</label>
@@ -734,7 +734,7 @@
         <div class="panel-body">
           <button class="quick-btn" id="quickUpdateBtn">
             Send Update Alert
-            <span class="qsub">Instant alert popup with one-click "Update and Restart" — fleet-wide</span>
+            <span class="qsub">Instant alert popup with one-click "Update and Restart" (fleet-wide)</span>
           </button>
           <button class="quick-btn outline" id="historyBtn">
             Message History
@@ -748,7 +748,7 @@
         <div class="panel-body">
           <div class="preview-toggle-row">
             <label class="field-label" style="margin:0;">Image Size</label>
-            <span class="size-readout" id="sizeReadout">— attach an image first —</span>
+            <span class="size-readout" id="sizeReadout">(attach an image first)</span>
           </div>
           <div class="size-slider-row full">
             <span class="size-label">Small</span>
@@ -881,7 +881,7 @@ async function doSenderLogin() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password }),
     });
-    if (res.status === 429) throw new Error('Too many attempts — wait a few minutes and try again.');
+    if (res.status === 429) throw new Error('Too many attempts. Wait a few minutes and try again.');
     if (res.status === 404) throw new Error('Login isn\'t set up on the relay yet.');
     if (!res.ok) throw new Error('Incorrect username or password.');
     const data = await res.json();
@@ -1033,7 +1033,7 @@ function updateMockPreview() {
     mockImgWrap.style.display = 'none';
     mockImgWrap.style.width = '';
     mockImgWrap.style.height = '';
-    sizeReadout.textContent = '— attach an image first —';
+    sizeReadout.textContent = '(attach an image first)';
   }
 }
 
@@ -1322,7 +1322,7 @@ async function refreshCurrent() {
     } else {
       const updateNote = content.show_update_button ? '  [+UPDATE BTN]' : '';
       const imageNote = content.image_url ? '  [+IMAGE]' : '';
-      currentVal.innerHTML = `${content.type.toUpperCase()} — "${content.message.replace(/</g,'&lt;')}"` +
+      currentVal.innerHTML = `${content.type.toUpperCase()}: "${content.message.replace(/</g,'&lt;')}"` +
         (updateNote ? `<span class="flag">${updateNote}</span>` : '') +
         (imageNote ? `<span class="flag">${imageNote}</span>` : '');
       currentVal.className = 'val';
@@ -1349,7 +1349,7 @@ async function transmitPayload(payload, commitLabel, busyBtn, imageDataUrl) {
     showStatus('busy', 'TRANSMITTING…');
     const { sha } = await getCurrentFile(token);
     await putFile(token, sha, payload, commitLabel);
-    showStatus('ok', 'SENT — fleet will pick this up within ~2 min');
+    showStatus('ok', 'SENT. Fleet will pick this up within ~2 min');
     if (imageDataUrl && pendingImageDataUrl) imgRemove.click();
     await refreshCurrent();
     // Logged after the real broadcast succeeds, and never awaited by
